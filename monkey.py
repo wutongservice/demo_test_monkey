@@ -1,5 +1,6 @@
 import subprocess
 import re
+from time import time
 
 def list3rdPartyPackages():
     prco = subprocess.Popen(['adb', 'shell', 'pm', 'list', 'packages', '-3'], stdout=subprocess.PIPE)
@@ -15,7 +16,7 @@ def list3rdPartyPackages():
 def main():
     for package in list3rdPartyPackages():
         print("Monkey test package %s" % package)
-        proc = subprocess.Popen(['adb', 'shell', 'monkey', '-p', package, '100'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        proc = subprocess.Popen(['adb', 'shell', 'monkey', '-p', package, '-s', '%d' % int(time()), '10000'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         proc.wait()
         if proc.returncode != 0:
             exit(-1)

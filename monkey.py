@@ -4,8 +4,8 @@ import signal
 from time import time
 
 def list3rdPartyPackages():
-    prco = subprocess.Popen(['adb', 'shell', 'pm', 'list', 'packages', '-3'], stdout=subprocess.PIPE)
-    out = prco.communicate()[0].decode('utf-8')
+    proc = subprocess.Popen(['adb', 'shell', 'pm', 'list', 'packages', '-3'], stdout=subprocess.PIPE)
+    out = proc.communicate()[0].decode('utf-8')
     packages = []
     for line in out.splitlines():
         m = re.match(r"^package:(\w+(?:\.\w+)*)", line)
@@ -13,14 +13,16 @@ def list3rdPartyPackages():
             packages.append(m.group(1))
     return packages
 
+proc = None
+def handler(signum, frame):
+    print("Handle SINGTERM...")
+    global proc
+    if proc is not None:
+        proc.kill()
+
 
 def main():
-    prco = None
-    def handler(signum, frame):
-        if proc is not None:
-            print("SINGTERM...")
-            proc.kill()
-            proc = None
+    global proc
     signal.signal(signal.SIGTERM, handler)
     for package in list3rdPartyPackages():
         print("Monkey test package %s" % package)

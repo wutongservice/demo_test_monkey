@@ -13,24 +13,14 @@ def list3rdPartyPackages():
             packages.append(m.group(1))
     return packages
 
-proc = None
-def handler(signum, frame):
-    print("Handle SINGTERM...")
-    global proc
-    if proc is not None:
-        proc.kill()
-
 
 def main():
-    global proc
-    signal.signal(signal.SIGTERM, handler)
     for package in list3rdPartyPackages():
         print("Monkey test package %s" % package)
-        proc = subprocess.Popen(['adb', 'shell', 'monkey', '-p', package, '--throttle', '200', '-s', '%d' % int(time()), '10000'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        proc = subprocess.Popen(['adb', 'shell', 'monkey', '-p', package, '--throttle', '500', '-s', '%d' % int(time()), '10000'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         proc.wait()
         if proc.returncode != 0:
             exit(-1)
-        proc = None
 
 
 if __name__ == '__main__':
